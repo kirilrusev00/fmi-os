@@ -1,0 +1,23 @@
+f1 - pairs
+f2 - data		// uint 32_t
+f3 - output
+
+struct pair_t {
+	uint32_t x; // start pos
+	uint32_t y; // # of elements
+}
+
+sizeof(f1) % sizeof(pair_t) = 0;
+sizeof(f2) % sizeof(uint32_t) = 0;
+
+struct pair_t pair;
+
+while read(f1, &pair)
+	seek(f2, pair.x * sizeof(uint32_t), SEEK_SET)
+	cnt = 0
+	uint32_t element
+	while read(f2, &element...) {
+		cnt++
+		write(f3, &element...)
+		if cnt == pair.y break
+	}
