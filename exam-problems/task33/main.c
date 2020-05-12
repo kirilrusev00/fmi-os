@@ -32,9 +32,9 @@ int main(int argc, char* argv[]){
 	}
 
 	uint32_t num_el = st.st_size / sizeof(uint32_t);
-	printf("%d\n", num_el);
+//	printf("%d\n", num_el);
 	uint32_t half = num_el / 2;
-	printf("%d\n", half);
+//	printf("%d\n", half);
 
 	int fd = open(argv[1], O_RDONLY);
 	if (fd < 0) {
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]){
 	free(p);	
 
 	half = num_el - half;
-	printf("%d\n", half);
+//	printf("%d\n", half);
 
 	int fd_temp2 = open("temp2", O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
     if (fd_temp2 < 0) {
@@ -91,6 +91,9 @@ int main(int argc, char* argv[]){
     }
 
     p = malloc(half*sizeof(uint32_t));
+	if (!p) {
+        err(20, "failed malloc");
+    }
 
     res = read(fd, p, half*sizeof(uint32_t));
     if (res != half*sizeof(uint32_t)) {
@@ -105,7 +108,7 @@ int main(int argc, char* argv[]){
 
     qsort(p, half, sizeof(uint32_t), cmp);
     
-	res = write(fd_temp1, p, half*sizeof(uint32_t));
+	res = write(fd_temp2, p, half*sizeof(uint32_t));
     if (res != half*sizeof(uint32_t)) {
         int olderrno = errno;
         close(fd);
@@ -156,6 +159,12 @@ int main(int argc, char* argv[]){
             lseek(fd_temp1, -1*sizeof(a), SEEK_CUR);
         }
     }
+
+	if (read(fd_temp2, &b, sizeof(b)) != sizeof(b)) {
+		write(fd, &a, sizeof(a));
+	} else {
+		write(fd, &b, sizeof(b));
+	}
 
     while (read(fd_temp1, &a, sizeof(a)) == sizeof(a)) {
         write(fd, &a, sizeof(a));
