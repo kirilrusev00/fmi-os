@@ -6,11 +6,10 @@
 #include <err.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 int main(int argc, char* argv[]) {
 	if (argc != 4) {
-		errx(1, "wrong argument count");
+		errx(1, "Usage: %s f1.bin f2.bin patch.bin", argv[0]);
 	}
 
 	const char* patch = argv[1];
@@ -19,14 +18,14 @@ int main(int argc, char* argv[]) {
 
 	struct stat st;
 	if (stat(f1, &st) < 0) {
-		err(1, "failed stat of %s", f1);
+		err(2, "failed stat of %s", f1);
 	}
 	off_t f1_size = st.st_size;
 	if (stat(f2, &st) < 0) {
-        err(1, "failed stat of %s", f2);
+        err(2, "failed stat of %s", f2);
     }
 	if (f1_size != st.st_size) {
-		errx(1, "sizes of %s and %s are not equal", f1, f2);
+		errx(3, "sizes of %s and %s are not equal", f1, f2);
 	}
 
 	struct entry_t {
@@ -37,14 +36,14 @@ int main(int argc, char* argv[]) {
 
 	const int fd_f1 = open(f1, O_RDONLY);
 	if (fd_f1 < 0) {
-		err(1, "failed to open %s", f1);
+		err(4, "failed to open %s", f1);
 	} 
 	const int fd_f2 = open(f2, O_RDONLY);
     if (fd_f2 < 0) {
 		int olderrno = errno;
 		close(fd_f1);
 		errno = olderrno;
-        err(1, "failed to open %s", f2);
+        err(4, "failed to open %s", f2);
     } 
 	const int fd_patch = open(patch, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     if (fd_patch < 0) {
@@ -52,7 +51,7 @@ int main(int argc, char* argv[]) {
         close(fd_f1);
 		close(fd_f2);
         errno = olderrno;
-        err(1, "failed to open %s", patch);
+        err(4, "failed to open %s", patch);
     }
 
 	uint8_t a;
@@ -61,7 +60,6 @@ int main(int argc, char* argv[]) {
 	uint16_t offset = 0;
 	struct entry_t e;
 	while(read(fd_f1, &a, sizeof(a)) && read(fd_f2, &b, sizeof(b))) {
-		printf("f1:%d\tf2:%d\n", a, b);
 		if (a != b) {
 			e.off = offset;
 			e.orig = a;
@@ -73,7 +71,7 @@ int main(int argc, char* argv[]) {
         		close(fd_f2);
         		close(fd_patch);
 				errno = olderrno;
-        		err(1, "failed write to %s", patch);
+        		err(5, "failed write to %s", patch);
 			}
 		}
 		offset++;
