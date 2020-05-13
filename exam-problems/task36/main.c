@@ -12,7 +12,7 @@
 void cat(int fd) {
 	char c;
     while (read(fd, &c, sizeof(c)) > 0) {
-        printf("%c", c);
+        write(1, &c, sizeof(c));
     }
 }
 
@@ -21,11 +21,12 @@ int cat_n(int fd, int count) {
     int is_start_line = 1;
     while (read(fd, &c, sizeof(c)) > 0) {
         if (is_start_line == 1) {
-            printf("\t%d ", count);
+			setbuf(stdout, NULL);
+            fprintf(stdout, "\t%d ", count);
             count++;
             is_start_line = 0;
         }
-        printf("%c", c);
+        write(1, &c, sizeof(c));
         if (c == '\n') {
             is_start_line = 1;
         }
