@@ -1,7 +1,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <err.h>
@@ -17,8 +16,14 @@ void tr_d(char* set) {
 	char c;
 	while (read(0, &c, sizeof(c)) == sizeof(c)) {
 		if (rem[(int) c] == 0) {
-			printf("%c", c);
-		} 	
+			write(1, &c, sizeof(c));
+		} 
+/*
+	char *ptr = strchr(set, c);
+	if (ptr!=NULL) {
+		write(1, &c, sizeof(c));
+	} 
+*/
 	}
 }
 
@@ -33,10 +38,10 @@ void tr_s(char* set) {
 	if (read(0, &c_prev, sizeof(c_prev)) < 0) {
 		err(2, "failed read from stdin");
 	}
-	printf("%c", c_prev);
+	write(1, &c_prev, sizeof(c_prev));
 	while (read(0, &c, sizeof(c)) == sizeof(c)) {
         if (rem[(int) c] == 0 || c != c_prev) {
-            printf("%c", c);
+			write(1, &c, sizeof(c));
         }
 		c_prev = c;
     }
@@ -58,26 +63,20 @@ void tr(char* set1, char* set2) {
 
 	char c;
     while (read(0, &c, sizeof(c)) == sizeof(c)) {
-        printf("%c", rem[(int) c]);
+		write(1, &rem[(int) c], sizeof(rem[(int) c]));
     }
 }
 
 int main(int argc, char* argv[]) {
-	if (argc < 2) {
+	if (argc != 3) {
 		errx(1, "wrong argument count");
 	}
 
 	if (strcmp(argv[1], "-d") == 0) {
-		if (argc != 3) {
-        	errx(1, "wrong argument count");
-    	}
 		tr_d(argv[2]);
 		exit(0);
 	}
-	if (strcmp(argv[1], "-s") == 0) {
-		if (argc != 3) {
-            errx(1, "wrong argument count");
-        }
+	else if (strcmp(argv[1], "-s") == 0) {
         tr_s(argv[2]);
 		exit(0);
     }

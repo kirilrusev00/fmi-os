@@ -2,7 +2,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
 #include <err.h>
 #include <errno.h>
 #include <string.h>
@@ -17,11 +16,11 @@ void cut_c(int start, int end) {
 	while (read(0, &c, sizeof(c)) > 0) {
 		count++;
 		if (c == '\n') {
-            printf("%c", c);
+			write(1, &c, sizeof(c));
             count = 0;
         }
 		if (start <= count && count <= end) {
-			printf("%c", c);
+			write(1, &c, sizeof(c));
 		}
 	}
 }
@@ -31,7 +30,7 @@ void cut_d(char delim, int start, int end) {
     char c;
     while (read(0, &c, sizeof(c)) > 0) {
         if (c == '\n') {
-            printf("%c", c);
+			write(1, &c, sizeof(c));
             count = 1;
 			continue;
         }
@@ -40,7 +39,7 @@ void cut_d(char delim, int start, int end) {
 			if (start == count) { continue; }
         }
         if (start <= count && count <= end) {
-            printf("%c", c);
+			write(1, &c, sizeof(c));
         }
     }
 }
@@ -53,14 +52,13 @@ int main(int argc, char* argv[]) {
 	if (strcmp(argv[1], "-c") == 0) {
 		int start = 0;
 		int end = 0;
-//		get_start_end(argv[2], start, end);
 		if (strlen(argv[2]) == 1) {
-        char s = argv[2][0];
-        if (s < '1' || '9' < s) {
-            errx(2, "second argument not a number");
-        }
-        start = s - '0';
-        end = start;
+       		char s = argv[2][0];
+        	if (s < '1' || '9' < s) {
+            	errx(2, "second argument not a number");
+        	}
+        	start = s - '0';
+        	end = start;
     	} else if (strlen(argv[2]) == 3) {
         	char s = argv[2][0];
         	char e = argv[2][2];
@@ -80,12 +78,12 @@ int main(int argc, char* argv[]) {
 		int start = 0;
         int end = 0;
         if (strlen(argv[4]) == 1) {
-        char s = argv[4][0];
-        if (s < '1' || '9' < s) {
-            errx(5, "fourth argument not a number");
-        }
-        start = s - '0';
-        end = start;
+        	char s = argv[4][0];
+        	if (s < '1' || '9' < s) {
+            	errx(5, "fourth argument not a number");
+        	}
+        	start = s - '0';
+        	end = start;
         } else if (strlen(argv[4]) == 3) {
             char s = argv[4][0];
             char e = argv[4][2];
