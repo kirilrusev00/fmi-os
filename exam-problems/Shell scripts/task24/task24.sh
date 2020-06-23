@@ -39,4 +39,5 @@ while read USER_ID; do
 	fi
 done < "${UIDS_TO_FIND}"
 
+rm -- "${UIDS_TO_FIND}"
 rm -- "${PROC}"
