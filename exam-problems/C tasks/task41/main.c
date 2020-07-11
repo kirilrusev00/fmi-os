@@ -26,10 +26,10 @@ int main (int argc, char* argv[]) {
 		errx(3, "Size of %s is invalid", argv[1]);
 	}
 
-	uint32_t num_elem = st.st_size / sizeof(uint32_t);
-	uint32_t half = num_elem / 2;
+	uint16_t num_elem = st.st_size / sizeof(uint16_t);
+	uint16_t half = num_elem / 2;
 
-	uint32_t *buf = malloc(half * sizeof(uint32_t));
+	uint16_t* buf = malloc(half * sizeof(uint16_t));
 	if (!buf) {
 		err(4, "Failed malloc");
 	}
@@ -42,8 +42,8 @@ int main (int argc, char* argv[]) {
 		err(5, "Failed to open %s", argv[1]);
 	}
 
-	size_t res = read(fd_input, buf, half*sizeof(uint32_t));
-	if (res != half*sizeof(uint32_t)) {
+	size_t res = read(fd_input, buf, half*sizeof(uint16_t));
+	if (res != half*sizeof(uint16_t)) {
 		int olderrno = errno;
         free(buf);
 		close(fd_input);
@@ -51,7 +51,7 @@ int main (int argc, char* argv[]) {
         err(6, "Failed read from %s", argv[1]);
 	}
 
-	qsort(buf, half, sizeof(uint32_t), cmp);
+	qsort(buf, half, sizeof(uint16_t), cmp);
 
 	int fd_temp1 = open("temp1", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	if (fd_temp1 < 0) {
@@ -61,8 +61,8 @@ int main (int argc, char* argv[]) {
 		errno = olderrno;
 		err(5, "Failed to open temp file 1");
 	}
-	res = write(fd_temp1, buf, half*sizeof(uint32_t));
-	if (res != half*sizeof(uint32_t)) {
+	res = write(fd_temp1, buf, half*sizeof(uint16_t));
+	if (res != half*sizeof(uint16_t)) {
 		int olderrno = errno;
 		free(buf);
 		close(fd_input);
@@ -74,12 +74,12 @@ int main (int argc, char* argv[]) {
 	free(buf);
 	half = num_elem - half;
 	
-	buf = malloc(half * sizeof(uint32_t));
+	buf = malloc(half * sizeof(uint16_t));
 	if (!buf) {
 		err(4, "Failed malloc");
 	}
-	res = read(fd_input, buf, half*sizeof(uint32_t));
-	if (res != half*sizeof(uint32_t)) {
+	res = read(fd_input, buf, half*sizeof(uint16_t));
+	if (res != half*sizeof(uint16_t)) {
 		int olderrno = errno;
         free(buf);
 		close(fd_input);
@@ -90,7 +90,7 @@ int main (int argc, char* argv[]) {
 
 	close(fd_input);
 
-	qsort(buf, half, sizeof(uint32_t), cmp);
+	qsort(buf, half, sizeof(uint16_t), cmp);
 	int fd_temp2 = open("temp2", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	if (fd_temp2 < 0) {
 		int olderrno = errno;
@@ -101,8 +101,8 @@ int main (int argc, char* argv[]) {
 		err(5, "Failed to open temp file 2");
 	}
 	
-	res = write(fd_temp2, buf, half*sizeof(uint32_t));
-	if (res != half*sizeof(uint32_t)) {
+	res = write(fd_temp2, buf, half*sizeof(uint16_t));
+	if (res != half*sizeof(uint16_t)) {
 		int olderrno = errno;
 		free(buf);
 		close(fd_input);
@@ -138,11 +138,11 @@ int main (int argc, char* argv[]) {
 		err(5, "Failed to open file %s", argv[2]);
 	}
 
-	uint32_t a;
-	uint32_t b;
-	while (read(fd_temp1, &a, sizeof(uint32_t)) == sizeof(uint32_t) && read(fd_temp2, &b, sizeof(uint32_t)) == sizeof(uint32_t)) {
+	uint16_t a;
+	uint16_t b;
+	while (read(fd_temp1, &a, sizeof(uint16_t)) == sizeof(uint16_t) && read(fd_temp2, &b, sizeof(uint16_t)) == sizeof(uint16_t)) {
 		if (a <= b) {
-			if (write(fd_output, &a, sizeof(uint32_t)) != sizeof(uint32_t)) {
+			if (write(fd_output, &a, sizeof(uint16_t)) != sizeof(uint16_t)) {
 				int olderrno = errno;
         		close(fd_output);
         		close(fd_temp1);
@@ -150,7 +150,7 @@ int main (int argc, char* argv[]) {
         		errno = olderrno;
         		err(7, "Failed to write to %s", argv[2]);
 			}
-			if (lseek(fd_temp2, -sizeof(uint32_t), SEEK_CUR) < 0) {
+			if (lseek(fd_temp2, -sizeof(uint16_t), SEEK_CUR) < 0) {
 				int olderrno = errno;
                 close(fd_output);
                 close(fd_temp1);
@@ -159,7 +159,7 @@ int main (int argc, char* argv[]) {
                 err(8, "Failed lseek in temp file 2");
 			}
 		} else {
-			if (write(fd_output, &b, sizeof(uint32_t)) != sizeof(uint32_t)) {
+			if (write(fd_output, &b, sizeof(uint16_t)) != sizeof(uint16_t)) {
 				int olderrno = errno;
         		close(fd_output);
         		close(fd_temp1);
@@ -167,7 +167,7 @@ int main (int argc, char* argv[]) {
         		errno = olderrno;
         		err(7, "Failed to write to %s", argv[2]);
 			}
-			if (lseek(fd_temp1, -sizeof(uint32_t), SEEK_CUR) < 0) {
+			if (lseek(fd_temp1, -sizeof(uint16_t), SEEK_CUR) < 0) {
                 int olderrno = errno;
                 close(fd_output);
                 close(fd_temp1);
@@ -184,8 +184,8 @@ int main (int argc, char* argv[]) {
 		write(fd_output, &b, sizeof(b));
 	}
 
-	while (read(fd_temp1, &a, sizeof(uint32_t)) == sizeof(uint32_t)) {
-		if (write(fd_output, &a, sizeof(uint32_t)) != sizeof(uint32_t)) {
+	while (read(fd_temp1, &a, sizeof(uint16_t)) == sizeof(uint16_t)) {
+		if (write(fd_output, &a, sizeof(uint16_t)) != sizeof(uint16_t)) {
 			int olderrno = errno;
         	close(fd_output);
         	close(fd_temp1);
@@ -195,8 +195,8 @@ int main (int argc, char* argv[]) {
 		}
 	}
 
-	while (read(fd_temp1, &b, sizeof(uint32_t)) == sizeof(uint32_t)) {
-        if (write(fd_output, &b, sizeof(uint32_t)) != sizeof(uint32_t)) {
+	while (read(fd_temp1, &b, sizeof(uint16_t)) == sizeof(uint16_t)) {
+        if (write(fd_output, &b, sizeof(uint16_t)) != sizeof(uint16_t)) {
             int olderrno = errno;
             close(fd_output);
             close(fd_temp1);
